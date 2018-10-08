@@ -1,0 +1,52 @@
+[
+  {
+  "question": "“Ossicone” is another name for antlers.",
+  "answer": false,
+  "explanation": "Ossicones are the horn-like protrusions of animals such as giraffes."
+  },
+  {
+    "question": "An axolotl is a fish.",
+    "answer": false,
+    "explanation": "An axolotl is an amphibian"
+  },
+  {
+    "question": "Andy Warhol used screenprinting to create art.",
+    "answer": true,
+    "explanation": "He was the artist who popularized the use of screenprinting"
+  },
+  {
+    "question": "The Korean language has a polite form of speech.",
+    "answer": true,
+    "explanation": null
+  },
+  {
+    "question": "Silkscreens are made of silk.",
+    "answer": false,
+    "explanation": "Silkscreens are now made of plastic."
+  },
+  {
+    "question": "Picasso was French.",
+    "answer": false,
+    "explanation": "Picasso was Spanish"
+  },
+  {
+    "question": "Fish keep their eyes open when they sleep.",
+    "answer": true,
+    "explanation": "Fish do not have eyelids to close."
+  },
+  {
+    "question": "One 1987 study in the Journal Of The American Veterinary Medical Association observed 132 cats had fallen an average of 5.5 stories and survived, and only half of the cats would have died without emergency treatment.",
+    "answer": false,
+    "explanation": "One third of the cats would have died without emergency treatment."
+  },
+  {
+    "question": "Aulophobia is the fear of flutes.",
+    "answer": true,
+    "explanation": null
+  },
+  {
+    "question": "A lizard that can walk on water exists.",
+    "answer": true,
+    "explanation": "It is commonly known as the Jesus Christ Lizard, a species of the Basiliscus genus."
+  }
+]
