@@ -4,6 +4,9 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -17,30 +20,49 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
-public class QuizActivity extends AppCompatActivity {
+public class QuizActivity extends AppCompatActivity implements View.OnClickListener {
 
+    private Button buttonTrue, buttonFalse, buttonNext;
+    private TextView textViewScore, textViewQuestionNum, textViewQuestion, textViewExplanation;
+    private Quiz quiz;
+    private Question question;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+        wireWidgets();
+        setListeners();
+        initializeQuiz();
+    }
+
+    private void initializeQuiz() {
         InputStream inputStream = getResources().openRawResource(R.raw.questions);
         String jsonString = readTextFile(inputStream);
         Gson gson = new Gson();
         Question[] questions =  gson.fromJson(jsonString, Question[].class);
         List<Question> questionList = Arrays.asList(questions);
-//        String questionscheck = "";
-//        String answerscheck = "";
-//        String explanationscheck = "";
-//        for(Question q: questionList){
-//            questionscheck += " " + q.getQuestion();
-//            answerscheck += " " + q.getAnswer();
-//            explanationscheck += " " + q.getExplanation();
-//        }
-//        Log.d("LOOK HERE", "onCreate: " + questionscheck + answerscheck + explanationscheck);
-
+        quiz = new Quiz(questionList);
+        question = quiz.getNextQuestion();
+        textViewQuestion.setText(question.getQuestion());
     }
 
-   public String readTextFile(InputStream inputStream) {
+    private void wireWidgets() {
+        buttonTrue = findViewById(R.id.button_quiz_true);
+        buttonFalse = findViewById(R.id.button_quiz_false);
+        buttonNext = findViewById(R.id.button_quiz_next);
+        textViewQuestion = findViewById(R.id.textview_quiz_question);
+        textViewQuestionNum = findViewById(R.id.textview_quiz_question_num);
+        textViewScore = findViewById(R.id.textview_quiz_score);
+        textViewExplanation = findViewById(R.id.textview_quiz_explanation);
+    }
+
+    private void setListeners() {
+        buttonTrue.setOnClickListener(this);
+        buttonNext.setOnClickListener(this);
+        buttonFalse.setOnClickListener(this);
+    }
+
+    public String readTextFile(InputStream inputStream) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
         byte buf[] = new byte[1024];
@@ -54,5 +76,40 @@ public class QuizActivity extends AppCompatActivity {
         } catch (IOException e) {
         }
         return outputStream.toString();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch(view.getId()){
+            case R.id.button_quiz_true:
+                buttonBasicFunction(true, buttonTrue, buttonFalse);
+                break;
+            case R.id.button_quiz_false:
+                buttonBasicFunction(false, buttonFalse, buttonTrue);
+                break;
+            case R.id.button_quiz_next:
+                textViewExplanation.setText("");
+                buttonNext.setVisibility(View.GONE);
+                question = quiz.getNextQuestion();
+                textViewQuestion.setText(question.getQuestion());
+                buttonTrue.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                buttonFalse.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                break;
+        }
+
+    }
+
+    private void buttonBasicFunction(boolean b, Button button, Button otherButton) {
+        textViewExplanation.setText(question.getExplanation());
+        buttonNext.setVisibility(View.VISIBLE);
+        if(question.checkAnswer(b)){
+            button.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+            otherButton.setBackgroundColor(getResources().getColor(R.color.colorRed));
+            quiz.addToScore(100);
+        }
+        else{
+            button.setBackgroundColor(getResources().getColor(R.color.colorRed));
+            otherButton.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+        }
     }
 }

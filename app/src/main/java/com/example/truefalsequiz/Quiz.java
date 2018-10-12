@@ -14,6 +14,7 @@ public class Quiz {
         for(Question q:questions){
             this.questions.add(q);
         }
+        score = 0;
     }
     public Question getNextQuestion(){
         questionNum++;
@@ -31,6 +32,10 @@ public class Quiz {
 
     public int getScore() {
         return score;
+    }
+
+    public void addToScore(int add){
+        score+=add;
     }
 
     public void addQuestion(Question question){
