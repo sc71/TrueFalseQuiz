@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">True False Quiz</string>
+    <string name="title_activity_final_screen" translatable="false">FinalScreenActivity</string>
+    <string name="_0">0</string>
+    <string name="play_again">Play Again</string>
+    <string name="score">Score: </string>
+    <string name="question_1">Question 1</string>
+    <string name="truetxt">True</string>
+    <string name="falsetxt">False</string>
+    <string name="next">next</string>
 </resources>

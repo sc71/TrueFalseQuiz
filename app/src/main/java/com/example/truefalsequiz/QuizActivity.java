@@ -1,5 +1,6 @@
 package com.example.truefalsequiz;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,10 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     private TextView textViewScore, textViewQuestionNum, textViewQuestion, textViewExplanation;
     private Quiz quiz;
     private Question question;
+
+    public static final String SCORE_CONST = "score_constant";
+    public static final int INTENT_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,6 +38,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         wireWidgets();
         setListeners();
         initializeQuiz();
+        textViewScore.setText(getString(R.string.score) + "0");
     }
 
     private void initializeQuiz() {
@@ -91,9 +97,16 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                 textViewExplanation.setText("");
                 buttonNext.setVisibility(View.GONE);
                 question = quiz.getNextQuestion();
-                textViewQuestion.setText(question.getQuestion());
-                buttonTrue.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                buttonFalse.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                if(question != null){
+                    textViewQuestion.setText(question.getQuestion());
+                    buttonTrue.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                    buttonFalse.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+                }
+                else{
+                    Intent intent = new Intent(QuizActivity.this, FinalScoreActivity.class);
+                    intent.putExtra(SCORE_CONST, quiz.getScore());
+                    startActivityForResult(intent, INTENT_CODE);
+                }
                 break;
         }
 
@@ -106,6 +119,8 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
             button.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             otherButton.setBackgroundColor(getResources().getColor(R.color.colorRed));
             quiz.addToScore(100);
+            String scoreText = getString(R.string.score) + quiz.getScore();
+            textViewScore.setText(scoreText);
         }
         else{
             button.setBackgroundColor(getResources().getColor(R.color.colorRed));
