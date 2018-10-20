@@ -1,6 +1,8 @@
 package com.example.truefalsequiz;
 
-public class Question {
+import java.io.Serializable;
+
+public class Question implements Serializable {
     private String question, explanation;
     private boolean answer;
 

@@ -1,6 +1,7 @@
 package com.example.truefalsequiz;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,15 +22,22 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import static android.view.View.VISIBLE;
+
 public class QuizActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button buttonTrue, buttonFalse, buttonNext;
     private TextView textViewScore, textViewQuestionNum, textViewQuestion, textViewExplanation;
     private Quiz quiz;
     private Question question;
+    private int questionNum;
 
     public static final String SCORE_CONST = "score_constant";
     public static final int INTENT_CODE = 1;
+    public static final String QUESTION = "QUESTION";
+    public static final String SCORE = "SCORE";
+    public static final String QUESTION_NUM = "QUESTION-NUM";
+    public static final String QUIZ = "QUIZ";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,18 +46,20 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         wireWidgets();
         setListeners();
         initializeQuiz();
-        textViewScore.setText(getString(R.string.score) + "0");
+        String text = getString(R.string.score) + "0";
+        textViewScore.setText(text);
     }
 
     private void initializeQuiz() {
         InputStream inputStream = getResources().openRawResource(R.raw.questions);
         String jsonString = readTextFile(inputStream);
         Gson gson = new Gson();
-        Question[] questions =  gson.fromJson(jsonString, Question[].class);
+        Question[] questions = gson.fromJson(jsonString, Question[].class);
         List<Question> questionList = Arrays.asList(questions);
         quiz = new Quiz(questionList);
         question = quiz.getNextQuestion();
         textViewQuestion.setText(question.getQuestion());
+        questionNum = 1;
     }
 
     private void wireWidgets() {
@@ -86,7 +96,7 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        switch(view.getId()){
+        switch (view.getId()) {
             case R.id.button_quiz_true:
                 buttonBasicFunction(true, buttonTrue, buttonFalse);
                 break;
@@ -97,12 +107,14 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                 textViewExplanation.setText("");
                 buttonNext.setVisibility(View.GONE);
                 question = quiz.getNextQuestion();
-                if(question != null){
+                if (question != null) {
                     textViewQuestion.setText(question.getQuestion());
+                    questionNum++;
+                    String text = getString(R.string.question) + questionNum;
+                    textViewQuestionNum.setText(text);
                     buttonTrue.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
                     buttonFalse.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                }
-                else{
+                } else {
                     Intent intent = new Intent(QuizActivity.this, FinalScoreActivity.class);
                     intent.putExtra(SCORE_CONST, quiz.getScore());
                     startActivityForResult(intent, INTENT_CODE);
@@ -112,19 +124,44 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     private void buttonBasicFunction(boolean b, Button button, Button otherButton) {
         textViewExplanation.setText(question.getExplanation());
-        buttonNext.setVisibility(View.VISIBLE);
-        if(question.checkAnswer(b)){
+        buttonNext.setVisibility(VISIBLE);
+        if (question.checkAnswer(b)) {
             button.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             otherButton.setBackgroundColor(getResources().getColor(R.color.colorRed));
             quiz.addToScore(100);
             String scoreText = getString(R.string.score) + quiz.getScore();
             textViewScore.setText(scoreText);
-        }
-        else{
+        } else {
             button.setBackgroundColor(getResources().getColor(R.color.colorRed));
             otherButton.setBackgroundColor(getResources().getColor(R.color.colorGreen));
         }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putSerializable(QUESTION, question);
+        outState.putInt(QUESTION_NUM, questionNum);
+        outState.putSerializable(QUIZ, quiz);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        question = (Question) savedInstanceState.getSerializable(QUESTION);
+        questionNum = savedInstanceState.getInt(QUESTION_NUM);
+        quiz = (Quiz) savedInstanceState.getSerializable(QUIZ);
+        String text = getString(R.string.question) + questionNum;
+        textViewQuestionNum.setText(text);
+        textViewQuestion.setText(question.getQuestion());
+        if(buttonNext.getVisibility() == VISIBLE){
+            textViewExplanation.setText(question.getExplanation());
+        }
+        String txt = "Score: " + quiz.getScore();
+        textViewScore.setText(txt);
+    }
+
 }

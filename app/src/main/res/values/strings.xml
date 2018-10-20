@@ -8,4 +8,5 @@
     <string name="truetxt">True</string>
     <string name="falsetxt">False</string>
     <string name="next">next</string>
+    <string name="question">Question\u0020</string>
 </resources>

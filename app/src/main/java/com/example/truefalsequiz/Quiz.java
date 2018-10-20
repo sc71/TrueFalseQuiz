@@ -1,9 +1,10 @@
 package com.example.truefalsequiz;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Quiz {
+public class Quiz implements Serializable {
     private List<Question> questions;
     private int score, questionNum;
 
