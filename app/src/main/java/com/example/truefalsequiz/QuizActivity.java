@@ -1,24 +1,21 @@
 package com.example.truefalsequiz;
 
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.net.Uri;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.transition.ChangeBounds;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.view.View;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.google.gson.Gson;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,9 +25,11 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     private Button buttonTrue, buttonFalse, buttonNext;
     private TextView textViewScore, textViewQuestionNum, textViewQuestion, textViewExplanation;
+    private TextView textViewQuestionGone;
     private Quiz quiz;
     private Question question;
     private int questionNum;
+    private boolean show;
 
     public static final String SCORE_CONST = "score_constant";
     public static final int INTENT_CODE = 1;
@@ -38,6 +37,10 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
     public static final String SCORE = "SCORE";
     public static final String QUESTION_NUM = "QUESTION-NUM";
     public static final String QUIZ = "QUIZ";
+
+    private ConstraintLayout constraintLayout;
+    private ConstraintSet constraintSet = new ConstraintSet();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +69,12 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         buttonTrue = findViewById(R.id.button_quiz_true);
         buttonFalse = findViewById(R.id.button_quiz_false);
         buttonNext = findViewById(R.id.button_quiz_next);
-        textViewQuestion = findViewById(R.id.textview_quiz_question);
+        textViewQuestion = findViewById(R.id.textview_quiz_question_gone);
+        textViewQuestionGone = findViewById(R.id.textview_quiz_question_gone);
         textViewQuestionNum = findViewById(R.id.textview_quiz_question_num);
         textViewScore = findViewById(R.id.textview_quiz_score);
         textViewExplanation = findViewById(R.id.textview_quiz_explanation);
+        constraintLayout = findViewById(R.id.constraint_layout_quiz_main);
     }
 
     private void setListeners() {
@@ -104,11 +109,15 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
                 buttonBasicFunction(false, buttonFalse, buttonTrue);
                 break;
             case R.id.button_quiz_next:
+                buttonNext.setText("");
+                hideComponents();
+                buttonFalse.setEnabled(true);
+                buttonTrue.setEnabled(true);
                 textViewExplanation.setText("");
-                buttonNext.setVisibility(View.GONE);
                 question = quiz.getNextQuestion();
                 if (question != null) {
                     textViewQuestion.setText(question.getQuestion());
+                    textViewQuestionGone.setText(question.getQuestion());
                     questionNum++;
                     String text = getString(R.string.question) + questionNum;
                     textViewQuestionNum.setText(text);
@@ -124,10 +133,12 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-
     private void buttonBasicFunction(boolean b, Button button, Button otherButton) {
+        buttonNext.setText(R.string.next);
+        showComponents();
         textViewExplanation.setText(question.getExplanation());
-        buttonNext.setVisibility(VISIBLE);
+        buttonFalse.setEnabled(false);
+        buttonTrue.setEnabled(false);
         if (question.checkAnswer(b)) {
             button.setBackgroundColor(getResources().getColor(R.color.colorGreen));
             otherButton.setBackgroundColor(getResources().getColor(R.color.colorRed));
@@ -162,6 +173,32 @@ public class QuizActivity extends AppCompatActivity implements View.OnClickListe
         }
         String txt = "Score: " + quiz.getScore();
         textViewScore.setText(txt);
+    }
+
+
+    private void showComponents(){
+
+        constraintSet.clone(this, R.layout.activity_quiz_next_gone);
+
+        Transition transition = new ChangeBounds();
+        transition.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
+        transition.setDuration(1000);
+
+        TransitionManager.beginDelayedTransition(constraintLayout, transition);
+        constraintSet.applyTo(constraintLayout);
+    }
+
+    private void hideComponents(){
+
+        constraintSet.clone(this, R.layout.activity_quiz);
+
+        Transition transition = new ChangeBounds();
+        transition.setInterpolator(new AnticipateOvershootInterpolator(1.0f));
+        transition.setDuration(1000);
+
+
+        TransitionManager.beginDelayedTransition(constraintLayout, transition);
+        constraintSet.applyTo(constraintLayout);
     }
 
 }
